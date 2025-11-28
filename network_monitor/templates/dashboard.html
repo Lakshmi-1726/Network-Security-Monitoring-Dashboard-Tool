@@ -1,0 +1,202 @@
+{% extends 'base.html' %}
+{% block content %}
+
+    
+</head>
+<h2 class="fw-bold mb-4">
+  <i class="bi bi-speedometer2 me-2"></i>Dashboard
+</h2>
+<h3 class="mb-3">
+    Welcome, {{ request.user.first_name|default:request.user.username }} 👋
+</h3>
+<p class="text-muted">
+    You are now logged into your Network Security Monitoring Dashboard.
+</p>
+
+
+<div class="row g-3 mb-4">
+
+  <div class="col-md-3 col-sm-6">
+    <div class="card shadow-sm border-0 text-bg-primary rounded-4">
+      <div class="card-body text-center">
+        <h6 class="fw-semibold">Total Events</h6>
+        <p class="fs-3 fw-bold">{{ total_events }}</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="col-md-3 col-sm-6">
+    <div class="card shadow-sm border-0 text-bg-success rounded-4">
+      <div class="card-body text-center">
+        <h6 class="fw-semibold">Active Users</h6>
+        <p class="fs-3 fw-bold">{{ active_users }}</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="col-md-3 col-sm-6">
+    <div class="card shadow-sm border-0 text-bg-warning rounded-4">
+      <div class="card-body text-center">
+        <h6 class="fw-semibold">Failed Logins</h6>
+        <p class="fs-3 fw-bold">{{ failed_logins }}</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="col-md-3 col-sm-6">
+    <div class="card shadow-sm border-0 text-bg-danger rounded-4">
+      <div class="card-body text-center">
+        <h6 class="fw-semibold">Active Alerts</h6>
+        <p class="fs-3 fw-bold">{{ alerts_count }}</p>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+
+
+<div class="row">
+
+  <div class="col-md-8 mb-4">
+
+    <h4 class="fw-semibold mb-3">
+      <i class="bi bi-clock-history me-2"></i>Recent Events
+    </h4>
+
+    <div class="card shadow-sm border-0 rounded-4">
+      <div class="table-responsive p-3">
+        <table class="table table-hover table-striped align-middle">
+          <thead class="table-light">
+            <tr>
+              <th>Time</th>
+              <th>Type</th>
+              <th>Severity</th>
+              <th>Source IP</th>
+              <th>Message</th>
+            </tr>
+          </thead>
+
+          <tbody id="events-table">
+            {% for ev in events_page %}
+            <tr>
+              <td>{{ ev.timestamp|date:"Y-m-d H:i:s" }}</td>
+              <td>{{ ev.event_type }}</td>
+              <td>{{ ev.severity }}</td>
+              <td>{{ ev.source_ip }}</td>
+              <td>{{ ev.message|truncatechars:60 }}</td>
+            </tr>
+            {% empty %}
+            <tr>
+              <td colspan="5" class="text-center text-muted">No events yet</td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+
+      
+      <div class="card-footer bg-white">
+        <nav>
+          <ul class="pagination justify-content-center mb-0">
+            {% if events_page.has_previous %}
+            <li class="page-item">
+              <a class="page-link" href="?page={{ events_page.previous_page_number }}">Previous</a>
+            </li>
+            {% endif %}
+
+            <li class="page-item disabled">
+              <span class="page-link">
+                Page {{ events_page.number }} of {{ events_page.paginator.num_pages }}
+              </span>
+            </li>
+
+            {% if events_page.has_next %}
+            <li class="page-item">
+              <a class="page-link" href="?page={{ events_page.next_page_number }}">Next</a>
+            </li>
+            {% endif %}
+          </ul>
+        </nav>
+      </div>
+
+    </div>
+  </div>
+
+
+  <div class="col-md-4">
+
+
+    <h4 class="fw-semibold mb-3">
+      <i class="bi bi-bar-chart-fill me-2"></i>Events in Last 14 Days
+    </h4>
+
+    <div class="card shadow-sm border-0 rounded-4 p-3 mb-4">
+      <div style="height: 260px;">
+        <canvas id="eventsChart"></canvas>
+      </div>
+    </div>
+
+ 
+    <h4 class="fw-semibold">
+      <i class="bi bi-exclamation-triangle-fill me-2 text-danger"></i>Alerts
+    </h4>
+
+    <div class="card shadow-sm border-0 rounded-4 p-3">
+      <a href="{% url 'events_list' %}?type=alerts" class="btn btn-danger btn-sm"> View All Alerts </a>
+
+    </div>
+
+  </div>
+</div>
+
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<script>
+  document.addEventListener('DOMContentLoaded', async function () {
+    const chartCanvas = document.getElementById('eventsChart');
+    if (!chartCanvas) return;
+
+    try {
+      const response = await fetch("{% url 'events_stats' %}");
+      const data = await response.json();
+
+      if (!data.labels || !data.counts) return;
+
+      const ctx = chartCanvas.getContext('2d');
+      new Chart(ctx, {
+        type: 'bar',
+        data: {
+          labels: data.labels,
+          datasets: [{
+            label: 'Events',
+            data: data.counts,
+            backgroundColor: 'rgba(54, 162, 235, 0.6)',
+            borderColor: 'rgba(54, 162, 235, 1)',
+            borderWidth: 1,
+            borderRadius: 6
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: { legend: { display: false } },
+          scales: {
+            y: {
+              beginAtZero: true,
+              grid: { color: 'rgba(200,200,200,0.1)' }
+            },
+            x: {
+              grid: { display: false }
+            }
+          }
+        }
+      });
+    } catch (err) {
+      console.error("Chart error:", err);
+    }
+  });
+</script>
+
+{% endblock %}

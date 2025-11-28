@@ -1,0 +1,85 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container mt-4">
+    <h2>{{ title }}</h2>
+
+    <p class="text-muted">
+        {% if event_type == "login_failure" %}
+            Showing all failed login events.
+        {% elif event_type == "active_user" %}
+            Showing all active user events.
+        {% elif event_type == "alerts" %}
+            Showing all active alerts and suspicious activity.
+        {% else %}
+            Showing all recorded events.
+        {% endif %}
+    </p>
+
+    <!-- 🔍 Search Bar -->
+    <div class="row mb-3">
+        <div class="col-md-6">
+            <form method="get" class="d-flex">
+                {% if event_type %}
+                    <input type="hidden" name="type" value="{{ event_type }}">
+                {% endif %}
+
+                <input
+                    type="text"
+                    name="q"
+                    class="form-control me-2"
+                    placeholder="Search event, device, IP or message..."
+                    value="{{ q|default:'' }}"
+                >
+                <button class="btn btn-outline-primary" type="submit">Search</button>
+            </form>
+        </div>
+    </div>
+    <!-- End Search Bar -->
+
+    <div class="table-responsive mt-3">
+        <table class="table table-striped table-hover table-sm">
+            <thead class="table-dark">
+                <tr>
+                    <th>Time</th>
+                    <th>Event Type</th>
+                    <th>Severity</th>
+                    <th>Device</th>
+                    <th>Message</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% if events %}
+                    {% for e in events %}
+                        <tr>
+                            <td>{{ e.timestamp|date:"M d, Y - h:i:s A" }}</td>
+                            <td>{{ e.event_type }}</td>
+                            <td>
+                                {% if e.severity|lower == "high" %}
+                                    <span class="badge bg-danger">HIGH</span>
+                                {% else %}
+                                    <span class="badge bg-secondary">{{ e.severity|upper }}</span>
+                                {% endif %}
+                            </td>
+                            <td>
+                                {% if e.device_name %}
+                                    {{ e.device_name }} ({{ e.source_ip }})
+                                {% else %}
+                                    {{ e.source_ip }}
+                                {% endif %}
+                            </td>
+                            <td>{{ e.message }}</td>
+                        </tr>
+                    {% endfor %}
+                {% else %}
+                    <tr>
+                        <td colspan="5" class="text-center text-muted">
+                            No events found.
+                        </td>
+                    </tr>
+                {% endif %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

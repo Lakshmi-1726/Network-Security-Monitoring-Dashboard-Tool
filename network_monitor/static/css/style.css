@@ -1,0 +1,135 @@
+body {
+    background-color: #f4f6f9 !important;
+    color: #333;
+    font-family: "Inter", "Segoe UI", Arial, sans-serif;
+}
+
+* {
+    transition: 0.15s ease-in-out;
+}
+
+.navbar-brand {
+    font-size: 1.3rem !important;
+    letter-spacing: 0.5px;
+}
+
+.nav-link {
+    font-weight: 500;
+}
+
+.nav-link:hover {
+    opacity: 0.75;
+}
+
+.navbar .btn-primary:hover {
+    background-color: #0a66c2;
+    border-color: #0a66c2;
+}
+
+
+.card {
+    border-radius: 14px !important;
+}
+
+.card:hover {
+    transform: translateY(-2px);
+}
+
+.card h6 {
+    font-size: 0.95rem;
+    text-transform: uppercase;
+}
+
+
+.table thead th {
+    font-weight: 600;
+    letter-spacing: 0.3px;
+}
+
+.table-hover tbody tr:hover {
+    background-color: rgba(0, 0, 0, 0.04);
+}
+
+.table-danger {
+    background-color: #fce4e4 !important;
+}
+
+.table-warning {
+    background-color: #fff4d6 !important;
+}
+
+.table-info {
+    background-color: #e6f7ff !important;
+}
+
+
+form input,
+form select,
+form textarea {
+    border-radius: 10px !important;
+}
+
+form input:focus,
+form select:focus,
+form textarea:focus {
+    box-shadow: 0 0 0 0.2rem rgba(13, 110, 253, 0.25);
+    border-color: #0d6efd !important;
+}
+
+button,
+.btn {
+    border-radius: 10px !important;
+    font-weight: 600;
+}
+
+.badge {
+    padding: 0.45em 0.65em;
+    font-size: 0.75rem;
+}
+
+
+.chart-container {
+    position: relative;
+    height: 260px;
+}
+
+
+::-webkit-scrollbar {
+    width: 8px;
+}
+
+::-webkit-scrollbar-track {
+    background: #e9ecef;
+}
+
+::-webkit-scrollbar-thumb {
+    background: #adb5bd;
+    border-radius: 10px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: #6c757d;
+}
+
+.fade-in {
+    animation: fadeIn 0.5s ease-in-out;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(5px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+input {
+  width: 100%;
+  padding: 10px;
+  border-radius: 6px;
+  border: 1px solid #ccc;
+}
+
+}
